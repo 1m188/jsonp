@@ -44,25 +44,25 @@ void expect_eq(const char *expect, const char *actual, const char *file, int lin
     do                                                                                                                 \
     {                                                                                                                  \
         lept_value v;                                                                                                  \
-        EXPECT_EQ(error, lept_parse(v, json));                                                                         \
+        EXPECT_EQ(error, lept_value::lept_parse(v, json));                                                             \
     } while (0)
 
 #define TEST_NUMBER(expect, json)                                                                                      \
     do                                                                                                                 \
     {                                                                                                                  \
         lept_value v;                                                                                                  \
-        EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, json));                                                                 \
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(v));                                                                      \
-        EXPECT_EQ(expect, lept_get_number(v));                                                                         \
+        EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, json));                                                     \
+        EXPECT_EQ(LEPT_NUMBER, v.lept_get_type());                                                                     \
+        EXPECT_EQ(expect, v.lept_get_number());                                                                        \
     } while (0)
 
 #define TEST_STRING(expect, json)                                                                                      \
     do                                                                                                                 \
     {                                                                                                                  \
         lept_value v;                                                                                                  \
-        EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, json));                                                                 \
-        EXPECT_EQ(LEPT_STRING, lept_get_type(v));                                                                      \
-        EXPECT_EQ(expect, lept_get_string(v));                                                                         \
+        EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, json));                                                     \
+        EXPECT_EQ(LEPT_STRING, v.lept_get_type());                                                                     \
+        EXPECT_EQ(expect, v.lept_get_string());                                                                        \
     } while (0)
 
 /************************************************************************************** */
@@ -73,15 +73,15 @@ void test_parse_null()
 #if 1 // 解析null值
     {
         lept_value v;
-        EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "null"));
-        EXPECT_EQ(LEPT_NULL, lept_get_type(v));
+        EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "null"));
+        EXPECT_EQ(LEPT_NULL, v.lept_get_type());
     }
 #endif
 
 #if 1 // 访问null值
     {
         lept_value v;
-        EXPECT_EQ(LEPT_NULL, lept_get_type(v));
+        EXPECT_EQ(LEPT_NULL, v.lept_get_type());
     }
 #endif
 }
@@ -90,20 +90,20 @@ void test_parse_null()
 void test_parse_true()
 {
     lept_value v;
-    lept_set_boolean(v, false);
-    EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "true"));
-    EXPECT_EQ(LEPT_TRUE, lept_get_type(v));
-    EXPECT_EQ(true, lept_get_boolean(v));
+    v.lept_set_boolean(false);
+    EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "true"));
+    EXPECT_EQ(LEPT_TRUE, v.lept_get_type());
+    EXPECT_EQ(true, v.lept_get_boolean());
 }
 
 /** 测试与false相关的内容 */
 void test_parse_false()
 {
     lept_value v;
-    lept_set_boolean(v, true);
-    EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "false"));
-    EXPECT_EQ(LEPT_FALSE, lept_get_type(v));
-    EXPECT_EQ(false, lept_get_boolean(v));
+    v.lept_set_boolean(true);
+    EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "false"));
+    EXPECT_EQ(LEPT_FALSE, v.lept_get_type());
+    EXPECT_EQ(false, v.lept_get_boolean());
 }
 
 void test_parse_error_value()
@@ -184,9 +184,9 @@ void test_parse_number()
 
 #if 1 // 访问number
     lept_value v;
-    lept_set_number(v, -0.12);
-    EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "12.788"));
-    EXPECT_EQ(12.788, lept_get_number(v));
+    v.lept_set_number(-0.12);
+    EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "12.788"));
+    EXPECT_EQ(12.788, v.lept_get_number());
 #endif
 }
 
@@ -221,8 +221,8 @@ void test_parse_string()
 
 #if 1 // 访问字符串
     lept_value v;
-    EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "\"Hello world\\n\""));
-    EXPECT_EQ(0, strcmp("Hello world\n", lept_get_string(v)));
+    EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "\"Hello world\\n\""));
+    EXPECT_EQ("Hello world\n", v.lept_get_string());
 #endif
 
 #if 1 // test_parse_invalid_unicode_hex
@@ -254,8 +254,8 @@ void test_parse_array()
 #if 1
     {
         lept_value v;
-        EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "[ ]"));
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(v));
+        EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "[ ]"));
+        EXPECT_EQ(LEPT_ARRAY, v.lept_get_type());
         EXPECT_EQ((std::vector<lept_value>::size_type)0, v.a.size());
     }
 #endif
@@ -263,69 +263,69 @@ void test_parse_array()
 #if 1
     {
         lept_value v;
-        EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "[ null , false , true , 123 , \"abc\" ]"));
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(v));
+        EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "[ null , false , true , 123 , \"abc\" ]"));
+        EXPECT_EQ(LEPT_ARRAY, v.lept_get_type());
 
-        const lept_value &e0 = lept_get_array_element(v, 0);
-        EXPECT_EQ(LEPT_NULL, lept_get_type(e0));
+        lept_value e0 = v.lept_get_array_element(0);
+        EXPECT_EQ(LEPT_NULL, e0.lept_get_type());
 
-        const lept_value &e1 = lept_get_array_element(v, 1);
-        EXPECT_EQ(LEPT_FALSE, lept_get_type(e1));
-        EXPECT_EQ(false, lept_get_boolean(e1));
+        lept_value e1 = v.lept_get_array_element(1);
+        EXPECT_EQ(LEPT_FALSE, e1.lept_get_type());
+        EXPECT_EQ(false, e1.lept_get_boolean());
 
-        const lept_value &e2 = lept_get_array_element(v, 2);
-        EXPECT_EQ(LEPT_TRUE, lept_get_type(e2));
-        EXPECT_EQ(true, lept_get_boolean(e2));
+        lept_value e2 = v.lept_get_array_element(2);
+        EXPECT_EQ(LEPT_TRUE, e2.lept_get_type());
+        EXPECT_EQ(true, e2.lept_get_boolean());
 
-        const lept_value &e3 = lept_get_array_element(v, 3);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e3));
-        EXPECT_EQ(123., lept_get_number(e3));
+        lept_value e3 = v.lept_get_array_element(3);
+        EXPECT_EQ(LEPT_NUMBER, e3.lept_get_type());
+        EXPECT_EQ(123., e3.lept_get_number());
 
-        const lept_value &e4 = lept_get_array_element(v, 4);
-        EXPECT_EQ(LEPT_STRING, lept_get_type(e4));
-        EXPECT_EQ("abc", lept_get_string(e4));
+        lept_value e4 = v.lept_get_array_element(4);
+        EXPECT_EQ(LEPT_STRING, e4.lept_get_type());
+        EXPECT_EQ("abc", e4.lept_get_string());
     }
 #endif
 
 #if 1
     {
         lept_value v;
-        EXPECT_EQ(LEPT_PARSE_OK, lept_parse(v, "[ [ ] , [ 0 ] , [ 0 , 1 ] , [ 0 , 1 , 2 ] ]"));
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(v));
+        EXPECT_EQ(LEPT_PARSE_OK, lept_value::lept_parse(v, "[ [ ] , [ 0 ] , [ 0 , 1 ] , [ 0 , 1 , 2 ] ]"));
+        EXPECT_EQ(LEPT_ARRAY, v.lept_get_type());
 
-        const lept_value &e0 = lept_get_array_element(v, 0);
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(e0));
+        lept_value e0 = (v.lept_get_array_element(0));
+        EXPECT_EQ(LEPT_ARRAY, e0.lept_get_type());
         EXPECT_EQ((std::vector<lept_value>::size_type)0, e0.a.size());
 
-        const lept_value &e1 = lept_get_array_element(v, 1);
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(e1));
+        lept_value e1 = (v.lept_get_array_element(1));
+        EXPECT_EQ(LEPT_ARRAY, e1.lept_get_type());
         EXPECT_EQ((std::vector<lept_value>::size_type)1, e1.a.size());
-        const lept_value &e1e0 = lept_get_array_element(e1, 0);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e1e0));
-        EXPECT_EQ(0., lept_get_number(e1e0));
+        lept_value e1e0 = (e1.lept_get_array_element(0));
+        EXPECT_EQ(LEPT_NUMBER, e1e0.lept_get_type());
+        EXPECT_EQ(0., e1e0.lept_get_number());
 
-        const lept_value &e2 = lept_get_array_element(v, 2);
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(e2));
+        lept_value e2 = (v.lept_get_array_element(2));
+        EXPECT_EQ(LEPT_ARRAY, e2.lept_get_type());
         EXPECT_EQ((std::vector<lept_value>::size_type)2, e2.a.size());
-        const lept_value &e2e0 = lept_get_array_element(e2, 0);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e2e0));
-        EXPECT_EQ(0., lept_get_number(e2e0));
-        const lept_value &e2e1 = lept_get_array_element(e2, 1);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e2e1));
-        EXPECT_EQ(1., lept_get_number(e2e1));
+        lept_value e2e0 = (e2.lept_get_array_element(0));
+        EXPECT_EQ(LEPT_NUMBER, e2e0.lept_get_type());
+        EXPECT_EQ(0., e2e0.lept_get_number());
+        lept_value e2e1 = (e2.lept_get_array_element(1));
+        EXPECT_EQ(LEPT_NUMBER, e2e1.lept_get_type());
+        EXPECT_EQ(1., e2e1.lept_get_number());
 
-        const lept_value &e3 = lept_get_array_element(v, 3);
-        EXPECT_EQ(LEPT_ARRAY, lept_get_type(e3));
+        lept_value e3 = (v.lept_get_array_element(3));
+        EXPECT_EQ(LEPT_ARRAY, e3.lept_get_type());
         EXPECT_EQ((std::vector<lept_value>::size_type)3, e3.a.size());
-        const lept_value &e3e0 = lept_get_array_element(e3, 0);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e3e0));
-        EXPECT_EQ(0., lept_get_number(e3e0));
-        const lept_value &e3e1 = lept_get_array_element(e3, 1);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e3e1));
-        EXPECT_EQ(1., lept_get_number(e3e1));
-        const lept_value &e3e2 = lept_get_array_element(e3, 2);
-        EXPECT_EQ(LEPT_NUMBER, lept_get_type(e3e2));
-        EXPECT_EQ(2., lept_get_number(e3e2));
+        lept_value e3e0 = (e3.lept_get_array_element(0));
+        EXPECT_EQ(LEPT_NUMBER, e3e0.lept_get_type());
+        EXPECT_EQ(0., e3e0.lept_get_number());
+        lept_value e3e1 = (e3.lept_get_array_element(1));
+        EXPECT_EQ(LEPT_NUMBER, e3e1.lept_get_type());
+        EXPECT_EQ(1., e3e1.lept_get_number());
+        lept_value e3e2 = (e3.lept_get_array_element(2));
+        EXPECT_EQ(LEPT_NUMBER, e3e2.lept_get_type());
+        EXPECT_EQ(2., e3e2.lept_get_number());
     }
 #endif
 }

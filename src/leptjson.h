@@ -1,7 +1,5 @@
 #pragma once
 
-// #include <cstddef>
-#include <unordered_map>
 #include <vector>
 
 /** 解析值的类型 */
@@ -44,21 +42,23 @@ struct lept_value
     std::vector<std::pair<lept_value, lept_value>> o; //对象
 
     lept_type type = LEPT_NULL;
+
+    lept_value() = default;
+
+    static lept_parse_ret lept_parse(lept_value &v, const char *json); // 解析json文本
+
+    lept_type lept_get_type(); // 获取解析值的类型
+
+    bool lept_get_boolean(); // 获取布尔值
+    void lept_set_boolean(bool b);
+
+    double lept_get_number(); // 获取数值类型的值
+    void lept_set_number(double n);
+
+    const char *lept_get_string(); // 获取字符串
+    void lept_set_string(const char *s);
+
+    lept_value lept_get_array_element(std::vector<lept_value>::size_type index); // 获取数组元素
+
+    lept_value lept_get_object_value(const lept_value &k); // 获取对象值
 };
-
-lept_parse_ret lept_parse(lept_value &v, const char *json); // 解析json文本
-
-lept_type lept_get_type(const lept_value &v); // 获取解析值的类型
-
-bool lept_get_boolean(const lept_value &v); // 获取布尔值
-void lept_set_boolean(lept_value &v, bool b);
-
-double lept_get_number(const lept_value &v); // 获取数值类型的值
-void lept_set_number(lept_value &v, double n);
-
-const char *lept_get_string(const lept_value &v); // 获取字符串
-void lept_set_string(lept_value &v, const char *s);
-
-const lept_value &lept_get_array_element(const lept_value &v, std::vector<lept_value>::size_type index); // 获取数组元素
-
-lept_value lept_get_object_value(const lept_value &v, const lept_value &k); // 获取对象值

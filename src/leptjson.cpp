@@ -2,11 +2,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cmath>
-#include <iostream>
-// #include <cstdlib>
-
-// #define ISDIGIT(ch) ((ch) >= '0' && (ch) <= '9')
-// #define ISDIGIT1TO9(ch) ((ch) >= '1' && (ch) <= '9')
+#include <cstdint>
 
 struct lept_context // 解析上下文
 {
@@ -381,7 +377,7 @@ lept_parse_ret lept_parse_value(lept_context &c, lept_value &v)
 
 /************************************************************************************************ */
 
-lept_parse_ret lept_parse(lept_value &v, const char *json)
+lept_parse_ret lept_value::lept_parse(lept_value &v, const char *json)
 {
     lept_context c; // 定义一个上下文
     c.json = json;
@@ -399,70 +395,67 @@ lept_parse_ret lept_parse(lept_value &v, const char *json)
     return ret;
 }
 
-/************************************************************************************************ */
-
-lept_type lept_get_type(const lept_value &v)
+lept_type lept_value::lept_get_type()
 {
-    return v.type;
+    return this->type;
 }
 
-bool lept_get_boolean(const lept_value &v)
+bool lept_value::lept_get_boolean()
 {
-    assert(v.type == LEPT_TRUE || v.type == LEPT_FALSE);
-    return v.b;
+    assert(this->type == LEPT_TRUE || this->type == LEPT_FALSE);
+    return this->b;
 }
 
-void lept_set_boolean(lept_value &v, bool b)
+void lept_value::lept_set_boolean(bool b)
 {
-    v = lept_value();
-    v.type = b ? LEPT_TRUE : LEPT_FALSE;
-    v.b = b;
+    *this = lept_value();
+    this->type = b ? LEPT_TRUE : LEPT_FALSE;
+    this->b = b;
 }
 
-double lept_get_number(const lept_value &v)
+double lept_value::lept_get_number()
 {
-    assert(v.type == LEPT_NUMBER);
-    return v.n;
+    assert(this->type == LEPT_NUMBER);
+    return this->n;
 }
 
-void lept_set_number(lept_value &v, double n)
+void lept_value::lept_set_number(double n)
 {
-    v = lept_value();
-    v.type = LEPT_NUMBER;
-    v.n = n;
+    *this = lept_value();
+    this->type = LEPT_NUMBER;
+    this->n = n;
 }
 
-const char *lept_get_string(const lept_value &v)
+const char *lept_value::lept_get_string()
 {
-    assert(v.type == LEPT_STRING);
-    return v.s.data();
+    assert(this->type == LEPT_STRING);
+    return this->s.data();
 }
 
-void lept_set_string(lept_value &v, const char *s)
+void lept_value::lept_set_string(const char *s)
 {
-    v = lept_value();
-    v.type = LEPT_STRING;
-    v.s.clear();
+    *this = lept_value();
+    this->type = LEPT_STRING;
+    this->s.clear();
     for (int i = 0;; i++)
     {
-        v.s.push_back(s[i]);
+        this->s.push_back(s[i]);
         if (s[i] == '\0')
             break;
     }
 }
 
-const lept_value &lept_get_array_element(const lept_value &v, std::vector<lept_value>::size_type index)
+lept_value lept_value::lept_get_array_element(std::vector<lept_value>::size_type index)
 {
-    assert(v.type == LEPT_ARRAY);
-    assert(index < v.a.size());
-    return v.a[index];
+    assert(this->type == LEPT_ARRAY && index < this->a.size());
+    return this->a[index];
 }
 
-lept_value lept_get_object_value(const lept_value &v, const lept_value &k)
+lept_value lept_value::lept_get_object_value(const lept_value &k)
 {
     assert(k.type == LEPT_STRING);
 
-    for (const auto &kv : v.o)
+    for (const auto &kv : this->o)
     {
         if (kv.first.s == k.s)
             return kv.second;
