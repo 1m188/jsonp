@@ -61,4 +61,4 @@ void lept_set_string(lept_value &v, const char *s);
 
 const lept_value &lept_get_array_element(const lept_value &v, std::vector<lept_value>::size_type index); // 获取数组元素
 
-const lept_value &lept_get_object_value(const lept_value &v, const lept_value &k); // 获取对象值
+lept_value lept_get_object_value(const lept_value &v, const lept_value &k); // 获取对象值

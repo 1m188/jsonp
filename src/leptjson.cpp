@@ -458,8 +458,15 @@ const lept_value &lept_get_array_element(const lept_value &v, std::vector<lept_v
     return v.a[index];
 }
 
-const lept_value &lept_get_object_value(const lept_value &v, const lept_value &k)
+lept_value lept_get_object_value(const lept_value &v, const lept_value &k)
 {
-    // TODO
-    return v.o[0].first;
+    assert(k.type == LEPT_STRING);
+
+    for (const auto &kv : v.o)
+    {
+        if (kv.first.s == k.s)
+            return kv.second;
+    }
+
+    return lept_value();
 }
